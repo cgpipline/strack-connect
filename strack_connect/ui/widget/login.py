@@ -64,6 +64,7 @@ class Login(QWidget, MFieldMixin):
         button_layout = QHBoxLayout()
         login_button = MPushButton(text='登录').primary()
         login_button.clicked.connect(self.slot_handle_login)
+
         button_layout.addWidget(login_button)
         button_layout.setContentsMargins(80, 40, 80, 20)
 
@@ -102,6 +103,8 @@ class Login(QWidget, MFieldMixin):
         if login_name == '' or password == '':
             self.on_set_error(u'请输入用户名，密码！', MAlert.WarningType)
             return
+        else:
+            self.on_set_error('', MAlert.InfoType)
 
         self.login.emit(login_name, password)
 
