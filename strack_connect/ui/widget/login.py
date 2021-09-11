@@ -14,7 +14,7 @@ from dayu_widgets.qt import QWidget, QPixmap, QVBoxLayout, MPixmap, QFormLayout,
 class Login(QWidget, MFieldMixin):
     """Login widget class."""
     # Login signal with params  username and password.
-    login = Signal(object, object)
+    login = Signal(object, object, object)
 
     # # Error signal that can be used to present an error message.
     loginError = Signal(object)
@@ -24,8 +24,8 @@ class Login(QWidget, MFieldMixin):
         self.setWindowTitle('strack connect')
 
         # setting login page size 600*400
-        self.setMaximumSize(560, 400)
-        self.setMinimumSize(560, 400)
+        self.setMaximumSize(560, 460)
+        self.setMinimumSize(560, 460)
 
         # use v layout
         main_lay = QVBoxLayout()
@@ -49,12 +49,16 @@ class Login(QWidget, MFieldMixin):
         form_lay.setLabelAlignment(Qt.AlignLeft)
         form_lay.setVerticalSpacing(16)
 
+        self.login_url_input = MLineEdit()
+        self.login_url_input.setPlaceholderText(u'请输入请求地址')
+
         self.login_name_input = MLineEdit()
         self.login_name_input.setPlaceholderText(u'请输入用户名')
 
         self.password_input = MLineEdit().password()
         self.password_input.setPlaceholderText(u'请输入密码')
 
+        form_lay.addRow(MLabel(u'URL：').strong(), self.login_url_input)
         form_lay.addRow(MLabel(u'登录名：').strong(), self.login_name_input)
         form_lay.addRow(MLabel(u'密码：').strong(), self.password_input)
 
@@ -96,17 +100,18 @@ class Login(QWidget, MFieldMixin):
 
     def slot_handle_login(self):
         """Fetch login data from form fields and emit login event."""
+        login_url = self.login_url_input.text()
         login_name = self.login_name_input.text()
         password = self.password_input.text()
 
         # login_name and password require
-        if login_name == '' or password == '':
-            self.on_set_error(u'请输入用户名，密码！', MAlert.WarningType)
+        if login_url == '' or login_name == '' or password == '':
+            self.on_set_error(u'URL，请输入用户名，密码！', MAlert.WarningType)
             return
         else:
             self.on_set_error('', MAlert.InfoType)
 
-        self.login.emit(login_name, password)
+        self.login.emit(login_url, login_name, password)
 
 
 if __name__ == '__main__':
