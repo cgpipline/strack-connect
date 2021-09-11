@@ -51,4 +51,4 @@ if __name__ == '__main__':
     from strack_connect.config.env import *
 
     obj = Config()
-    print(obj.get('ws_server.port.test'))
+    print(obj.get('ws_server.port'))
