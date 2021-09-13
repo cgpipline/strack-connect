@@ -19,7 +19,7 @@ class Login(QWidget, MFieldMixin):
     login = Signal(object, object, object)
 
     # # Error signal that can be used to present an error message.
-    loginError = Signal(object, object)
+    loginMsg = Signal(object, object)
 
     def __init__(self, parent=None, **kwargs):
         super(Login, self).__init__(parent)
@@ -99,7 +99,7 @@ class Login(QWidget, MFieldMixin):
 
         error_message_layout.addWidget(error_label)
         error_message_layout.setContentsMargins(20, 0, 20, 0)
-        self.loginError.connect(self.on_set_error)
+        self.loginMsg.connect(self.on_set_msg)
 
         main_lay.addLayout(error_message_layout)
 
@@ -114,7 +114,7 @@ class Login(QWidget, MFieldMixin):
             self.loading_mask = LoadingMask(parent=self)
             self.installEventFilter(self.loading_mask)
 
-    def on_set_error(self, alert_text, alert_type):
+    def on_set_msg(self, alert_text, alert_type):
         """Set the error text and disable the login widget."""
         # hide plane loading
         self.loading_mask.hide()
@@ -131,10 +131,10 @@ class Login(QWidget, MFieldMixin):
 
         # login_name and password require
         if login_url == '' or login_name == '' or password == '':
-            self.on_set_error(u'URL，请输入用户名，密码！', MAlert.WarningType)
+            self.on_set_msg(u'URL，请输入用户名，密码！', MAlert.WarningType)
             return
         else:
-            self.on_set_error('', MAlert.InfoType)
+            self.on_set_msg('', MAlert.InfoType)
 
         # show plane loading
         self.loading_mask.show_loading()
