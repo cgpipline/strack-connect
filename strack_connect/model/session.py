@@ -13,6 +13,7 @@ class LoginThread(QThread):
     """Session api by thread"""
     # Login Msg signal.
     loginMsg = Signal(object, object)
+    loginSuccessSignal = Signal()
     url = ""
     username = ""
     password = ""

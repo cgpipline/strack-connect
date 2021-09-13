@@ -120,6 +120,7 @@ class Application(QMainWindow):
         if url is not None and username is not None and password is not None:
             self._login_server_thread = LoginThread()
             self._login_server_thread.loginMsg.connect(self.loginMsg)
+            self._login_server_thread.loginSuccessSignal.connect(self.loginSuccessSignal)
             self._login_server_thread.start(url, username, password)
             return
 
