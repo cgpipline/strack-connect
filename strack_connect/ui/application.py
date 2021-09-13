@@ -3,6 +3,7 @@
 
 import time
 from strack_connect.config.env import Env
+from strack_connect.model.session import Session
 from strack_connect.config.log import *
 from strack_connect.config.config import Config
 from strack_connect.ui.widget import login as _login
@@ -40,7 +41,7 @@ class Application(QMainWindow):
         config.load("config.yaml")
 
         # init logger
-        set_logger(["connect_runtime", "api"])
+        set_loggers(["connect_runtime", "api"])
 
         self.logoIcon = MPixmap(
             '{}/images/favicon.ico'.format(os.getenv('RESOUCE_PATH'))
@@ -62,8 +63,10 @@ class Application(QMainWindow):
         self.show_login_widget()
 
     def login_request(self, url, username, password):
-        print(url, username, password)
-        self.loginError.emit("错误信息", MAlert.ErrorType)
+        session = Session()
+        res = session.get_token(url, username, password)
+        if not res['code']:
+            self.loginError.emit(res['msg'], MAlert.ErrorType)
 
     def show_login_widget(self):
         """Show the login widget."""

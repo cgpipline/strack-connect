@@ -117,7 +117,7 @@ class Login(QWidget, MFieldMixin):
     def on_set_error(self, alert_text, alert_type):
         """Set the error text and disable the login widget."""
         # hide plane loading
-        # self.loading_mask.hide()
+        self.loading_mask.hide()
 
         # show error tip msg
         self.set_field('msg_type', alert_type)

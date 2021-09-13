@@ -2,7 +2,11 @@
 # :copyright: Copyright (c) 2021 strack
 
 import os
+import sys
+import time
+import logging.handlers
 import logging
+import tempfile
 from logging.handlers import TimedRotatingFileHandler
 
 LOG_FORMATTER = "[%(asctime)s][%(levelname)s][%(filename)s lineno %(lineno)d]: %(message)s"
@@ -47,7 +51,7 @@ def setup_logging(logger_name):
     return logger
 
 
-def set_logger(logger_names=None):
+def set_loggers(logger_names=None):
     """ init strack loggers"""
     if logger_names is None:
         logger_names = ["connect_runtime", "api"]
@@ -58,8 +62,28 @@ def set_logger(logger_names=None):
         logger.setLevel(logging.DEBUG)
 
 
+def get_logger(logger_name=None, level=logging.DEBUG,
+               log_format='%(asctime)s - STRACK API - %(filename)s:%(lineno)s - %(message)s'):
+    time_code = time.time()
+    # LOG_FILE = os.path.join(os.environ.get("TMP"), 'STRACK_API_%s.log' % time_code)
+    log_file = os.path.join(tempfile.gettempdir(), 'STRACK_API_%s.log' % time_code)
+
+    if not logger_name:
+        logger_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+    handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=1024 * 1024, backupCount=5)  # 实例化handler
+
+    formatter = logging.Formatter(log_format)
+    handler.setFormatter(formatter)
+
+    logger = logging.getLogger(logger_name)
+    logger.addHandler(handler)
+    logger.setLevel(level)
+
+    return logger
+
+
 if __name__ == '__main__':
     from strack_connect.config.env import Env
 
     Env()
-    set_logger(["connect_runtime", "api"])
+    set_loggers(["connect_runtime", "api"])
