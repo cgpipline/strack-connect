@@ -47,7 +47,19 @@ def setup_logging(logger_name):
     return logger
 
 
-for logger_name in ["teamones_desktop", "api_logger"]:
-    logger = setup_logging(logger_name)
-    logger.info("Starting {} logging.".format(logger_name))
-    logger.setLevel(logging.DEBUG)
+def set_logger(logger_names=None):
+    """ init strack loggers"""
+    if logger_names is None:
+        logger_names = ["connect_runtime", "api"]
+
+    for logger_name in logger_names:
+        logger = setup_logging(logger_name)
+        logger.info("Starting {} logging.".format(logger_name))
+        logger.setLevel(logging.DEBUG)
+
+
+if __name__ == '__main__':
+    from strack_connect.config.env import Env
+
+    Env()
+    set_logger(["connect_runtime", "api"])

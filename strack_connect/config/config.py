@@ -21,11 +21,11 @@ class Config(object):
                     Config._instance = object.__new__(cls)
         return Config._instance
 
-    def get(self, name):
-        # load yaml config file
+    def load(self, name="config.yaml"):
+        """ default file config.yaml"""
         if not bool(self.config):
             config_path = os.getenv('CONFIG_PATH')
-            yaml_path = os.path.join(config_path, "config.yaml")
+            yaml_path = os.path.join(config_path, name)
 
             # read config yaml
             f = open(yaml_path, 'r', encoding='utf-8')
@@ -33,6 +33,10 @@ class Config(object):
 
             # convert dictionary with load method
             self.config = yaml.load(yaml_str, Loader=yaml.FullLoader)
+
+    def get(self, name):
+        # load yaml config file
+        self.init()
 
         if isinstance(name, str) and '.' in name:
             param = copy.deepcopy(self.config)
@@ -48,7 +52,9 @@ class Config(object):
 
 
 if __name__ == '__main__':
-    from strack_connect.config.env import *
+    from strack_connect.config.env import Env
+
+    Env()
 
     obj = Config()
     print(obj.get('ws_server.port'))

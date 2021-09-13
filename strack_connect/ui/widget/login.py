@@ -1,6 +1,7 @@
 # :coding: utf-8
 # :copyright: Copyright (c) 2021 strack
 
+import os
 from dayu_widgets.alert import MAlert
 from dayu_widgets.avatar import MAvatar
 from dayu_widgets.line_edit import MLineEdit
@@ -19,8 +20,12 @@ class Login(QWidget, MFieldMixin):
     # # Error signal that can be used to present an error message.
     loginError = Signal(object)
 
-    def __init__(self, parent=None):
-        super(Login, self).__init__(parent)
+    def __init__(self, *args, **kwargs):
+        super(Login, self).__init__()
+
+        theme = kwargs.get("theme", "dark")
+        dayu_theme.set_theme(theme)
+
         self.setWindowTitle('strack connect')
 
         # setting login page size 600*400
@@ -34,9 +39,17 @@ class Login(QWidget, MFieldMixin):
         icon_layout = QHBoxLayout()
         logon_icon = MAvatar()
 
-        logon_icon.set_dayu_image(MPixmap(
-            './../resource/images/desktop_logo.png'
-        ))
+        resource_path = os.getenv('RESOUCE_PATH')
+
+        if resource_path is not None:
+            logon_icon.set_dayu_image(MPixmap(
+                '{}/images/desktop_logo.png'.format(resource_path)
+            ))
+        else:
+            logon_icon.set_dayu_image(MPixmap(
+                './../resource/images/desktop_logo.png'
+            ))
+
         logon_icon.set_dayu_size(140)
 
         icon_layout.addWidget(logon_icon)
