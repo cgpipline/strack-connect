@@ -1,14 +1,12 @@
 # :coding: utf-8
 # :copyright: Copyright (c) 2021 strack
 
-import time
 from strack_connect.config.env import Env
-from strack_connect.model.session import Session
+from strack_connect.model.session import Session, LoginThread
 from strack_connect.config.log import *
 from strack_connect.config.config import Config
 from strack_connect.ui.widget import login as _login
-from dayu_widgets.alert import MAlert
-from dayu_widgets.qt import QMainWindow, Signal, MPixmap
+from dayu_widgets.qt import QMainWindow, QApplication, QSystemTrayIcon, QMenu, QAction, Signal, MPixmap
 from dayu_widgets import dayu_theme
 
 
@@ -16,7 +14,7 @@ class Application(QMainWindow):
     """ Main application window for strack connect.' """
 
     #: Signal when login fails.
-    loginError = Signal(object, object)
+    loginMsg = Signal(object, object)
 
     # Login signal.
     loginSignal = Signal(object, object, object)
@@ -30,8 +28,9 @@ class Application(QMainWindow):
     def __init__(self, theme='dark'):
         super(Application, self).__init__()
 
-        # reset session
+        # reset
         self._session = None
+        self._login_server_thread = None
 
         # load env
         Env()
@@ -51,11 +50,59 @@ class Application(QMainWindow):
         self.setWindowTitle('strack connect')
         self.setWindowIcon(self.logoIcon)
 
+        self._initialiseTray(self.logoIcon)
+
         self.setMaximumSize(560, 460)
         self.setMinimumSize(560, 460)
         self.loginWidget = _login.Login(parent=self, theme=theme)
         self.loginSignal.connect(self.login_request)
+        self.loginSuccessSignal.connect(self._post_login_settings)
         self.login()
+
+    def _createTrayMenu(self):
+        """Return a menu for system tray."""
+        menu = QMenu(self)
+
+        quit_action = QAction(
+            'Quit', self,
+            triggered=QApplication.quit
+        )
+
+        focus_action = QAction(
+            'Open', self,
+            triggered=self.focus
+        )
+
+        about_action = QAction(
+            'About', self,
+            triggered=self.show_about
+        )
+
+        menu.addAction(about_action)
+        menu.addSeparator()
+        menu.addAction(focus_action)
+        menu.addSeparator()
+        menu.addAction(quit_action)
+
+        return menu
+
+    def _initialiseTray(self, icon):
+        '''Initialise and add application icon to system tray.'''
+        self.trayMenu = self._createTrayMenu()
+        self.tray = QSystemTrayIcon(self)
+
+        self.tray.setContextMenu(
+            self.trayMenu
+        )
+        self.tray.setIcon(icon)
+
+    def show_about(self):
+        """Display window with about information."""
+        print("about")
+
+    def _post_login_settings(self):
+        if self.tray:
+            self.tray.show()
 
     def login(self):
         """Login using stored credentials or ask user for them."""
@@ -63,15 +110,23 @@ class Application(QMainWindow):
         self.show_login_widget()
 
     def login_request(self, url, username, password):
-        session = Session()
-        res = session.get_token(url, username, password)
-        if not res['code']:
-            self.loginError.emit(res['msg'], MAlert.ErrorType)
+
+        # If there is an existing server thread running we need to stop it.
+        if self._login_server_thread:
+            self._login_server_thread.quit()
+            self._login_server_thread = None
+
+        # get token by QThread
+        if url is not None and username is not None and password is not None:
+            self._login_server_thread = LoginThread()
+            self._login_server_thread.loginMsg.connect(self.loginMsg)
+            self._login_server_thread.start(url, username, password)
+            return
 
     def show_login_widget(self):
         """Show the login widget."""
         self.setCentralWidget(self.loginWidget)
-        self.loginError.connect(self.loginWidget.loginError.emit)
+        self.loginMsg.connect(self.loginWidget.loginMsg.emit)
         self.loginWidget.setFocus()
 
     def focus(self):

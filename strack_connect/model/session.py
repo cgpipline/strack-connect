@@ -4,7 +4,40 @@
 import traceback
 from strack_connect.config.log import *
 from strack_api.strack import Strack
+from dayu_widgets.qt import QThread, Signal
+from dayu_widgets.alert import MAlert
 import threading
+
+
+class LoginThread(QThread):
+    """Session api by thread"""
+    # Login Msg signal.
+    loginMsg = Signal(object, object)
+    url = ""
+    username = ""
+    password = ""
+
+    def start(self, url, username, password):
+        """Start thread."""
+        self.url = url
+        self.username = username
+        self.password = password
+        super(LoginThread, self).start()
+
+    def _handle_login(self):
+        """Login to server with *api_user* and *api_key*."""
+        session = Session()
+
+        res = session.get_token(self.url, self.username, self.password)
+        if not res['code']:
+            self.loginMsg.emit(res['msg'], MAlert.ErrorType)
+        else:
+            self.loginMsg.emit(res['msg'], MAlert.SuccessType)
+            self.loginSuccessSignal.emit()
+
+    def run(self):
+        """Listen for events."""
+        self._handle_login()
 
 
 class Session(object):
@@ -32,7 +65,7 @@ class Session(object):
                 raise RuntimeError('Cannot find user named %s.' % username)
             return {
                 'code': True,
-                'msg': ""
+                'msg': u"登录成功，正在跳转……"
             }
         except Exception as err:
             logger.error("login failed. Please check login info.")
@@ -40,5 +73,5 @@ class Session(object):
             logger.error(traceback.format_exc())
             return {
                 'code': False,
-                'msg': "login failed. %s." % err.args
+                'msg': u"登录失败. %s." % err.args
             }
