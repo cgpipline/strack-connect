@@ -36,7 +36,7 @@ class Config(object):
 
     def get(self, name):
         # load yaml config file
-        self.init()
+        self.load()
 
         if isinstance(name, str) and '.' in name:
             param = copy.deepcopy(self.config)
