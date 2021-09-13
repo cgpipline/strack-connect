@@ -8,7 +8,7 @@ from dayu_widgets.qt import Qt, QWidget, QMainWindow, QFont, QFontMetrics, QMovi
 
 
 class LoadingMask(QMainWindow):
-    def __init__(self, parent=None, gif=None):
+    def __init__(self, parent=None):
         super(LoadingMask, self).__init__(parent)
 
         self.label = MLabel()
