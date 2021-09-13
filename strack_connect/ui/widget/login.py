@@ -10,6 +10,7 @@ from dayu_widgets.label import MLabel
 from dayu_widgets.push_button import MPushButton
 from dayu_widgets import dayu_theme
 from dayu_widgets.qt import QWidget, QPixmap, QVBoxLayout, MPixmap, QFormLayout, Qt, QHBoxLayout, Signal
+from strack_connect.ui.widget.loading import LoadingMask
 
 
 class Login(QWidget, MFieldMixin):
@@ -18,10 +19,10 @@ class Login(QWidget, MFieldMixin):
     login = Signal(object, object, object)
 
     # # Error signal that can be used to present an error message.
-    loginError = Signal(object)
+    loginError = Signal(object, object)
 
-    def __init__(self, *args, **kwargs):
-        super(Login, self).__init__()
+    def __init__(self, parent=None, **kwargs):
+        super(Login, self).__init__(parent)
 
         theme = kwargs.get("theme", "dark")
         dayu_theme.set_theme(theme)
@@ -106,8 +107,19 @@ class Login(QWidget, MFieldMixin):
 
         self.setLayout(main_lay)
 
+        if parent is not None:
+            self.loading_mask = LoadingMask(parent=parent)
+            parent.installEventFilter(self.loading_mask)
+        else:
+            self.loading_mask = LoadingMask(parent=self)
+            self.installEventFilter(self.loading_mask)
+
     def on_set_error(self, alert_text, alert_type):
         """Set the error text and disable the login widget."""
+        # hide plane loading
+        # self.loading_mask.hide()
+
+        # show error tip msg
         self.set_field('msg_type', alert_type)
         self.set_field('msg', alert_text)
 
@@ -124,6 +136,10 @@ class Login(QWidget, MFieldMixin):
         else:
             self.on_set_error('', MAlert.InfoType)
 
+        # show plane loading
+        self.loading_mask.show_loading()
+
+        # emit login parm
         self.login.emit(login_url, login_name, password)
 
 

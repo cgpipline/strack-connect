@@ -1,12 +1,13 @@
 # :coding: utf-8
 # :copyright: Copyright (c) 2021 strack
 
-from strack_connect.config.strack_error import StrackError
+import time
 from strack_connect.config.env import Env
 from strack_connect.config.log import *
 from strack_connect.config.config import Config
 from strack_connect.ui.widget import login as _login
-from dayu_widgets.qt import QMainWindow, Signal
+from dayu_widgets.alert import MAlert
+from dayu_widgets.qt import QMainWindow, Signal, MPixmap
 from dayu_widgets import dayu_theme
 
 
@@ -14,7 +15,7 @@ class Application(QMainWindow):
     """ Main application window for strack connect.' """
 
     #: Signal when login fails.
-    loginError = Signal(object)
+    loginError = Signal(object, object)
 
     # Login signal.
     loginSignal = Signal(object, object, object)
@@ -41,12 +42,28 @@ class Application(QMainWindow):
         # init logger
         set_logger(["connect_runtime", "api"])
 
-        self.loginWidget = _login.Login(theme=theme)
+        self.logoIcon = MPixmap(
+            '{}/images/favicon.ico'.format(os.getenv('RESOUCE_PATH'))
+        )
+
+        self.setObjectName('strack-connect-window')
+        self.setWindowTitle('strack connect')
+        self.setWindowIcon(self.logoIcon)
+
+        self.setMaximumSize(560, 460)
+        self.setMinimumSize(560, 460)
+        self.loginWidget = _login.Login(parent=self, theme=theme)
+        self.loginSignal.connect(self.login_request)
         self.login()
 
     def login(self):
         """Login using stored credentials or ask user for them."""
+        self.loginWidget.login.connect(self.login_request)
         self.show_login_widget()
+
+    def login_request(self, url, username, password):
+        print(url, username, password)
+        self.loginError.emit("错误信息", MAlert.ErrorType)
 
     def show_login_widget(self):
         """Show the login widget."""

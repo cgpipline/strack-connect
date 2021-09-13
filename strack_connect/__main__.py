@@ -10,7 +10,6 @@ from dayu_widgets import dayu_theme
 
 def main():
     # If under X11, make Xlib calls thread-safe.
-    # http://stackoverflow.com/questions/31952711/threading-pyqt-crashes-with-unknown-request-in-queue-while-dequeuing
     if os.name == 'posix':
         QCoreApplication.setAttribute(Qt.AA_X11InitThreads)
 
