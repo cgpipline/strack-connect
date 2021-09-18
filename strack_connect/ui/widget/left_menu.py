@@ -2,14 +2,19 @@
 # :copyright: Copyright (c) 2021 strack
 
 import os
+import functools
+
 from dayu_widgets.avatar import MAvatar
 from dayu_widgets.label import MLabel
 from dayu_widgets.menu_tab_widget import MMenuTabWidget
 from dayu_widgets.divider import MDivider
-from dayu_widgets.qt import QWidget, Qt, QVBoxLayout, QHBoxLayout, MPixmap
+from dayu_widgets.qt import QWidget, Qt, QVBoxLayout, QHBoxLayout, MPixmap, Signal
 
 
 class LeftMenu(QWidget):
+    # menu click signal
+    menuClicked = Signal(object)
+
     def __init__(self, parent=None):
         super(LeftMenu, self).__init__(parent)
         self.setWindowTitle('Left main menu')
@@ -39,14 +44,15 @@ class LeftMenu(QWidget):
             img_path = '{}/resource/images/'.format(os.path.dirname(os.getcwd()))
 
         button_list = [
-            {'text': u'任务', 'svg': '{}menu_task.svg'.format(img_path)},
-            {'text': u'应用', 'svg': '{}menu_launcher.svg'.format(img_path)},
-            {'text': u'Actions', 'svg': '{}menu_action.svg'.format(img_path)},
-            {'text': u'配置', 'svg': '{}menu_setting.svg'.format(img_path)}
+            {'text': u'任务', 'svg': '{}menu_task.svg'.format(img_path), 'clicked': functools.partial(self.menu_clicked)},
+            {'text': u'应用', 'svg': '{}menu_launcher.svg'.format(img_path), 'clicked': functools.partial(self.menu_clicked)},
+            {'text': u'Actions', 'svg': '{}menu_action.svg'.format(img_path), 'clicked': functools.partial(self.menu_clicked)},
+            {'text': u'配置', 'svg': '{}menu_setting.svg'.format(img_path), 'clicked': functools.partial(self.menu_clicked)}
         ]
 
         menu = MMenuTabWidget(orientation=Qt.Vertical)
         for index, data_dict in enumerate(button_list):
+            data_dict['clicked'] = functools.partial(self.menu_clicked, index)
             menu.add_menu(data_dict, index)
 
         menu.tool_button_group.set_dayu_checked(0)
@@ -65,6 +71,10 @@ class LeftMenu(QWidget):
 
         main_lay.addStretch()
         self.setLayout(main_lay)
+
+    def menu_clicked(self, index):
+        # emit index
+        self.menuClicked.emit(index)
 
 
 if __name__ == '__main__':

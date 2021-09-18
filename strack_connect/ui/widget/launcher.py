@@ -1,14 +1,15 @@
 # :coding: utf-8
 # :copyright: Copyright (c) 2021 strack
 
-from dayu_widgets.qt import QWidget, QHBoxLayout
+from dayu_widgets.label import MLabel
+from dayu_widgets.qt import QWidget, QVBoxLayout
 
 
-class ProjectList(QWidget):
+class Launcher(QWidget):
     def __init__(self, parent=None):
-        super(ProjectList, self).__init__(parent)
+        super(Launcher, self).__init__(parent)
 
-        self.setWindowTitle('project list')
+        self.setWindowTitle('launcher')
 
         # setting login page size 700*600
         self.setMaximumSize(940, 700)
@@ -17,7 +18,9 @@ class ProjectList(QWidget):
         self._init_ui()
 
     def _init_ui(self):
-        print('project')
+        main_lay = QVBoxLayout()
+        main_lay.addWidget(MLabel('launcher').h1().strong())
+        self.setLayout(main_lay)
 
 
 if __name__ == '__main__':
@@ -26,7 +29,7 @@ if __name__ == '__main__':
     from dayu_widgets.qt import QApplication
 
     app = QApplication(sys.argv)
-    test = ProjectList()
+    test = Launcher()
     dayu_theme.apply(test)
 
     test.show()

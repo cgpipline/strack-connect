@@ -4,7 +4,7 @@
 import os
 import importlib
 import codecs
-from dayu_widgets.qt import QWidget, QHBoxLayout, QStackedWidget
+from dayu_widgets.qt import QWidget, QHBoxLayout, QStackedWidget, Signal
 
 
 class Main(QWidget):
@@ -29,21 +29,31 @@ class Main(QWidget):
         if left_menu.get('cls') is not None:
             left_menu_widget = left_menu.get('cls')()
             left_menu_widget.setProperty('code', left_menu.get('code'))
+            left_menu_widget.menuClicked.connect(self.slot_change_widget)
             main_lay.addWidget(left_menu_widget)
             main_lay.setStretchFactor(left_menu_widget, 1)
 
-        # load project list
-        project_list = self.get_widget_by_name('project_list')
+        # load main list
+        main_list = ['task', 'launcher', 'action', 'setting']
 
-        if project_list.get('cls') is not None:
-            project_list_widget = project_list.get('cls')()
-            project_list_widget.setProperty('code', project_list.get('code'))
-            main_lay.addWidget(project_list_widget)
-            main_lay.setStretchFactor(project_list_widget, 1)
+        for index, key in enumerate(main_list):
+            main_temp = self.get_widget_by_name(key)
+
+            if main_temp.get('cls') is not None:
+                main_temp_widget = main_temp.get('cls')()
+                main_temp_widget.setProperty('code', main_temp.get('code'))
+                self.stacked_widget.addWidget(main_temp_widget)
+
+        main_lay.addWidget(self.stacked_widget)
+        main_lay.setStretchFactor(self.stacked_widget, 1)
 
         # main_lay.addStretch()
         main_lay.setContentsMargins(0, 0, 0, 0)
         self.setLayout(main_lay)
+
+    def slot_change_widget(self, index):
+        print(index)
+        self.stacked_widget.setCurrentIndex(index)
 
     @staticmethod
     def get_widget_by_name(name=None):
