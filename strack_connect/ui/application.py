@@ -5,6 +5,7 @@ from strack_connect.model.session import Session, LoginThread
 from strack_connect.config.log import *
 from strack_connect.config.config import Config
 from strack_connect.ui.widget import login as _login
+from strack_connect.ui.widget import main as _main
 from dayu_widgets.qt import QMainWindow, QApplication, QSystemTrayIcon, QMenu, QAction, Signal, MPixmap
 from dayu_widgets import dayu_theme
 
@@ -99,6 +100,11 @@ class Application(QMainWindow):
     def _post_login_settings(self):
         if self.tray:
             self.tray.show()
+
+        self.setMinimumSize(1140, 700)
+        self.mainWidget = _main.Main(parent=self)
+        self.setCentralWidget(self.mainWidget)
+        self.focus()
 
     def login(self):
         """Login using stored credentials or ask user for them."""
