@@ -1,20 +1,17 @@
 # :coding: utf-8
 # :copyright: Copyright (c) 2021 strack
 
-import functools
-
 import os
 from dayu_widgets.avatar import MAvatar
 from dayu_widgets.label import MLabel
 from dayu_widgets.menu_tab_widget import MMenuTabWidget
 from dayu_widgets.divider import MDivider
-from strack_connect.ui import dayu_theme
 from dayu_widgets.qt import QWidget, Qt, QVBoxLayout, QHBoxLayout, MPixmap
 
 
-class MenuTabWidgetExample(QWidget):
+class LeftMenu(QWidget):
     def __init__(self, parent=None):
-        super(MenuTabWidgetExample, self).__init__(parent)
+        super(LeftMenu, self).__init__(parent)
         self.setWindowTitle('Left main menu')
         self._init_ui()
 
@@ -72,10 +69,11 @@ class MenuTabWidgetExample(QWidget):
 
 if __name__ == '__main__':
     import sys
+    from strack_connect.ui import dayu_theme
     from dayu_widgets.qt import QApplication
 
     app = QApplication(sys.argv)
-    test = MenuTabWidgetExample()
+    test = LeftMenu()
     dayu_theme.apply(test)
 
     test.show()

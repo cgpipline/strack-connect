@@ -1,11 +1,12 @@
 # :coding: utf-8
 # :copyright: Copyright (c) 2021 strack
 
+# load env
 import os
 import signal
 import strack_connect.ui.application
 from dayu_widgets.qt import QApplication, QCoreApplication, Qt
-from dayu_widgets import dayu_theme
+from strack_connect.ui import dayu_theme
 
 
 def main():

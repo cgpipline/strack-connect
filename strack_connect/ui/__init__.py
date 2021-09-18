@@ -3,6 +3,8 @@
 
 # Load UI resources such as icons.
 
-from .theme import MTheme
+from strack_connect.config.env import Env
+Env()
 
+from .theme import MTheme
 dayu_theme = MTheme('dark', primary_color=MTheme.orange)

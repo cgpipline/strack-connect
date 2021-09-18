@@ -8,7 +8,7 @@ from dayu_widgets.line_edit import MLineEdit
 from dayu_widgets.field_mixin import MFieldMixin
 from dayu_widgets.label import MLabel
 from dayu_widgets.push_button import MPushButton
-from dayu_widgets import dayu_theme
+from strack_connect.ui import dayu_theme
 from dayu_widgets.qt import QWidget, QPixmap, QVBoxLayout, MPixmap, QFormLayout, Qt, QHBoxLayout, Signal
 from strack_connect.ui.widget.loading import LoadingMask
 
@@ -21,18 +21,20 @@ class Login(QWidget, MFieldMixin):
     # # Error signal that can be used to present an error message.
     loginMsg = Signal(object, object)
 
-    def __init__(self, parent=None, **kwargs):
+    def __init__(self, parent=None):
         super(Login, self).__init__(parent)
+        self.parent = parent
 
-        theme = kwargs.get("theme", "dark")
-        dayu_theme.set_theme(theme)
-
-        self.setWindowTitle('strack connect')
+        self.setWindowTitle('login')
 
         # setting login page size 600*400
         self.setMaximumSize(560, 460)
         self.setMinimumSize(560, 460)
 
+        # init ui
+        self._init_ui()
+
+    def _init_ui(self):
         # use v layout
         main_lay = QVBoxLayout()
 
@@ -107,9 +109,9 @@ class Login(QWidget, MFieldMixin):
 
         self.setLayout(main_lay)
 
-        if parent is not None:
-            self.loading_mask = LoadingMask(parent=parent)
-            parent.installEventFilter(self.loading_mask)
+        if self.parent is not None:
+            self.loading_mask = LoadingMask(parent=self.parent)
+            self.parent.installEventFilter(self.loading_mask)
         else:
             self.loading_mask = LoadingMask(parent=self)
             self.installEventFilter(self.loading_mask)

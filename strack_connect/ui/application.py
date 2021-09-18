@@ -1,7 +1,6 @@
 # :coding: utf-8
 # :copyright: Copyright (c) 2021 strack
 
-from strack_connect.config.env import Env
 from strack_connect.model.session import Session, LoginThread
 from strack_connect.config.log import *
 from strack_connect.config.config import Config
@@ -32,9 +31,6 @@ class Application(QMainWindow):
         self._session = None
         self._login_server_thread = None
 
-        # load env
-        Env()
-
         # load config
         config = Config()
         config.load("config.yaml")
@@ -54,7 +50,7 @@ class Application(QMainWindow):
 
         self.setMaximumSize(560, 460)
         self.setMinimumSize(560, 460)
-        self.loginWidget = _login.Login(parent=self, theme=theme)
+        self.loginWidget = _login.Login(parent=self)
         self.loginSignal.connect(self.login_request)
         self.loginSuccessSignal.connect(self._post_login_settings)
         self.login()
