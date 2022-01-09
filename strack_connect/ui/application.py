@@ -6,7 +6,7 @@ from strack_connect.config.log import *
 from strack_connect.config.config import Config
 from strack_connect.ui.widget import login as _login
 from strack_connect.ui.widget import main as _main
-from dayu_widgets.qt import QMainWindow, QApplication, QSystemTrayIcon, QMenu, QAction, Signal, MPixmap
+from dayu_widgets.qt import QMainWindow, QApplication, QSystemTrayIcon, QMenu, QAction, Signal, MPixmap, MIcon
 from dayu_widgets import dayu_theme
 
 
@@ -38,11 +38,7 @@ class Application(QMainWindow):
 
         # init logger
         set_loggers(["connect_runtime", "api"])
-
-        self.logoIcon = MPixmap(
-            '{}/images/favicon.ico'.format(os.getenv('RESOUCE_PATH'))
-        )
-
+        self.logoIcon = MIcon('{}/images/favicon.ico'.format(os.getenv('RESOUCE_PATH')))
         self.setObjectName('strack-connect-window')
         self.setWindowTitle('strack connect')
         self.setWindowIcon(self.logoIcon)

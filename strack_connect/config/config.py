@@ -1,7 +1,13 @@
+#!/usr/bin/env python
+# coding=utf-8
+'''
+Author: zuokangbo
+Date: 2022-01-05 22:32:50
+'''
 # :coding: utf-8
 # :copyright: Copyright (c) 2021 strack
 
-import os
+import os, sys
 import copy
 import yaml
 import threading
@@ -28,7 +34,10 @@ class Config(object):
             yaml_path = os.path.join(config_path, name)
 
             # read config yaml
-            f = open(yaml_path, 'r', encoding='utf-8')
+            if sys.version_info == 3:
+                f = open(yaml_path, 'r', encoding='utf-8')
+            else:
+                f = open(yaml_path, 'r')
             yaml_str = f.read()
 
             # convert dictionary with load method
