@@ -2,6 +2,7 @@
 # :copyright: Copyright (c) 2021 strack
 
 import os
+import sqlite3
 from dayu_widgets.alert import MAlert
 from dayu_widgets.avatar import MAvatar
 from dayu_widgets.line_edit import MLineEdit
@@ -11,6 +12,7 @@ from dayu_widgets.push_button import MPushButton
 from strack_connect.ui import dayu_theme
 from dayu_widgets.qt import QWidget, QPixmap, QVBoxLayout, MPixmap, QFormLayout, Qt, QHBoxLayout, Signal
 from strack_connect.ui.widget.loading import LoadingMask
+from dayu_widgets.check_box import MCheckBox
 
 
 class Login(QWidget, MFieldMixin):
@@ -33,6 +35,7 @@ class Login(QWidget, MFieldMixin):
 
         # init ui
         self._init_ui()
+        self.__read_login_set()
 
     def _init_ui(self):
         # use v layout
@@ -74,11 +77,18 @@ class Login(QWidget, MFieldMixin):
         self.password_input = MLineEdit().password()
         self.password_input.setPlaceholderText(u'请输入密码')
 
+        self.remember_password_check = MCheckBox(u"记住密码")
+        self.auto_login_check = MCheckBox(u"自动登录")
         form_lay.addRow(MLabel(u'URL：').strong(), self.login_url_input)
         form_lay.addRow(MLabel(u'登录名：').strong(), self.login_name_input)
         form_lay.addRow(MLabel(u'密码：').strong(), self.password_input)
+        check_layout = QHBoxLayout()
+        check_layout.setContentsMargins(150, 10, 80, 10)
+        check_layout.addWidget(self.remember_password_check)
+        check_layout.addWidget(self.auto_login_check)
 
         main_lay.addLayout(form_lay)
+        main_lay.addLayout(check_layout)
 
         # login button
         button_layout = QHBoxLayout()
@@ -143,6 +153,19 @@ class Login(QWidget, MFieldMixin):
 
         # emit login parm
         self.login.emit(login_url, login_name, password)
+
+    def __read_login_set(self):
+
+        user_setting_path = "{}/strack-connect/user_setting.db".format(os.environ.get("temp"))
+        if not os.path.exists(user_setting_path):
+            return
+        conn = sqlite3.connect(user_setting_path)
+        c = conn.cursor()
+        login_user_data = c.execute("SELECT user_name,url,password from login_user")
+        for row in login_user_data:
+            self.login_name_input.setText(row[0])
+            self.login_url_input.setText(row[1])
+            self.password_input.setText(row[2])
 
 
 if __name__ == '__main__':

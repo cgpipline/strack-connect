@@ -17,7 +17,10 @@ develop-eggs
 lib
 lib64
 __pycache__
-
+strack_api
+dayu_widgets
+dayu_path
+test
 # Installer logs
 pip-log.txt
 
@@ -37,6 +40,8 @@ Thumbs.db
 .pydevproject
 .settings
 .idea/
+*.pyc
+Qt.py
 source/ftrack_connect/ui/resource.py
 source/ftrack_connect/_version.py
 
