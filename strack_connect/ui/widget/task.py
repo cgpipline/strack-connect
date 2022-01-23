@@ -6,7 +6,7 @@ Date: 2022-01-05 22:32:50
 
 from dayu_widgets.qt import QWidget, QVBoxLayout, QListWidget, QListWidgetItem, MPixmap, QListView, QSize
 from dayu_widgets.card import MMeta
-from ui.widget.component.top_select import BarTopSelect
+from strack_connect.ui.widget.component.top_select import BarTopSelect
 
 
 class Task(QWidget):
@@ -31,7 +31,7 @@ class Task(QWidget):
         self.setLayout(main_lay)
     
     def add_project_item(self, setting):
-        project_card = MMeta()
+        project_card = MMeta(parent=self)
         project_card.setup_data(setting)
         myQListWidgetItem = QListWidgetItem(self.task_pm_list)
         myQListWidgetItem.setSizeHint(QSize(204, 260))

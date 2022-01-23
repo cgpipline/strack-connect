@@ -1,6 +1,9 @@
 # :coding: utf-8
 # :copyright: Copyright (c) 2021 strack
 
+import os
+import sqlite3
+
 from strack_connect.model.session import Session, LoginThread
 from strack_connect.config.log import *
 from strack_connect.config.config import Config
@@ -101,6 +104,43 @@ class Application(QMainWindow):
         self.mainWidget = _main.Main(parent=self)
         self.setCentralWidget(self.mainWidget)
         self.focus()
+        self._save_user_settings()
+
+    def _save_user_settings(self):
+        user_setting_path = "{}/strack-connect/user_setting.db".format(os.environ.get("temp"))
+        if not os.path.exists(os.path.dirname(user_setting_path)):
+            os.makedirs(os.path.dirname(user_setting_path))
+        status = {True: 1, False: 0}
+        auto_login_check = self.loginWidget.auto_login_check.isChecked()
+        remember_password = self.loginWidget.remember_password_check.isChecked()
+        if remember_password:
+            conn = sqlite3.connect(user_setting_path)
+            c = conn.cursor()
+            create_table_sql = """create table if not exists login_user
+            (id integer primary key autoincrement,
+            user_name varchar(20),
+            url text not NULL,
+            password text not NULL,
+            is_autologin integer not NULL,
+            is_remember integer not NULL)
+            """
+            c.execute(create_table_sql)
+            conn.commit()
+            login_user_data = c.execute("SELECT id from login_user")
+            if len(list(login_user_data)) == 1:
+                c.execute("UPDATE login_user set user_name='{}',"
+                          " url='{}',password='{}', is_remember={}, is_autologin={} where id=1".format(
+                    self.loginWidget.login_name_input.text(), self.loginWidget.login_url_input.text(),
+                    self.loginWidget.password_input.text(), status[remember_password], status[auto_login_check]
+                ))
+            else:
+                save_info_sql = """insert into login_user (user_name, url, password, is_remember, is_autologin)
+                VALUES ('{}','{}', '{}', {}, {})
+                """.format(self.loginWidget.login_name_input.text(), self.loginWidget.login_url_input.text(),
+                           self.loginWidget.password_input.text(), status[remember_password], status[auto_login_check])
+                c.execute(save_info_sql)
+            conn.commit()
+            conn.close()
 
     def login(self):
         """Login using stored credentials or ask user for them."""
